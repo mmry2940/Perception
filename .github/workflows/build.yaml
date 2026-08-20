@@ -11,7 +11,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Setup Environment Variables
       # Note: In a real-world scenario, this step would need to handle setting 
@@ -44,7 +44,7 @@ jobs:
         msbuild Perception_v3/VireioPerception.sln /p:Configuration=Release /p:Platform=x64
       
     - name: Archive Artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: perception-release-build
         path: Perception_v3/Release/
