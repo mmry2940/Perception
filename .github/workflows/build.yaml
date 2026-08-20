@@ -1,0 +1,50 @@
+name: Build Perception Project
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Environment Variables
+      # Note: In a real-world scenario, this step would need to handle setting 
+      # complex environment variables (like FREESPACE and DXSDK_DIR) 
+      # based on environment setup for the build agent.
+      run: |
+        echo "Setting up environment variables..."
+        # Add actual variable setup logic here if using a custom action or script
+
+    - name: Install Dependencies (e.g., MSBuild)
+      run: |
+        # On windows-latest, MSBuild is usually available, but explicit setup 
+        # for VS 2012/2013 compatibility might be needed here.
+        # Example: Install-Module -Name MSBuild -Version 15.0
+
+    - name: Build Core Libraries (Aquilinus)
+      run: |
+        # Compiling the core library first is critical.
+        msbuild Aquilinus/Aquilinus.sln /p:Configuration=Release /p:Platform=x64
+      
+    - name: Build Proxy/Injection Layer (DxProxy)
+      run: |
+        # This step handles the DLL interception layer, which must link against
+        # the core library.
+        msbuild Perception_v3/DxProxy/DxProxy.sln /p:Configuration=Release /p:Platform=x64
+
+    - name: Build Application (Perception)
+      run: |
+        # Building the final application that links all components.
+        msbuild Perception_v3/VireioPerception.sln /p:Configuration=Release /p:Platform=x64
+      
+    - name: Archive Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: perception-release-build
+        path: Perception_v3/Release/
